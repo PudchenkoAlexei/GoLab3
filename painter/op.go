@@ -56,9 +56,9 @@ type Figure struct {
 }
 
 func (op *Figure) Do(t screen.Texture) bool {
-	c := color.RGBA{R: 255, G: 255}
-	t.Fill(image.Rect(op.CentralPoint.X-75, op.CentralPoint.Y-50, op.CentralPoint.X+75, op.CentralPoint.Y), c, draw.Src)
-	t.Fill(image.Rect(op.CentralPoint.X-25, op.CentralPoint.Y, op.CentralPoint.X+25, op.CentralPoint.Y+50), c, draw.Src)
+	c := color.RGBA{R: 0, G: 0, B: 255, A: 255}
+	t.Fill(image.Rect(op.CentralPoint.X-150, op.CentralPoint.Y-50, op.CentralPoint.X+150, op.CentralPoint.Y+50), c, draw.Src)
+	t.Fill(image.Rect(op.CentralPoint.X-50, op.CentralPoint.Y-100, op.CentralPoint.X+50, op.CentralPoint.Y+100), c, draw.Src)
 	return false
 }
 
@@ -87,5 +87,5 @@ func GreenFill(t screen.Texture) {
 }
 
 func Reset(t screen.Texture) {
-	t.Fill(t.Bounds(), color.Black, screen.Src)
+	t.Fill(t.Bounds(), color.White, screen.Src)
 }
