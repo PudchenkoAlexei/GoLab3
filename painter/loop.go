@@ -33,7 +33,7 @@ func (l *Loop) Start(s screen.Screen) {
 	l.prev, _ = s.NewTexture(size)
 
 	l.stop = make(chan struct{})
-	//go func() {
+	go func() {
 		for !l.stopReq || !l.Mq.empty() {
 			op := l.Mq.pull()
 			update := op.Do(l.next)
