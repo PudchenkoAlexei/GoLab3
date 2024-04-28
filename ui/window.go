@@ -25,15 +25,15 @@ type Visualizer struct {
 	tx   chan screen.Texture
 	done chan struct{}
 
-	sz  size.Event
-	pos image.Rectangle
+	sz     size.Event
+	center image.Point
 }
 
 func (pw *Visualizer) Main() {
 	pw.tx = make(chan screen.Texture)
 	pw.done = make(chan struct{})
-	pw.pos.Max.X = 200
-	pw.pos.Max.Y = 200
+	pw.center.X = 800 / 2
+	pw.center.Y = 800 / 2
 	driver.Main(pw.run)
 }
 
@@ -43,7 +43,9 @@ func (pw *Visualizer) Update(t screen.Texture) {
 
 func (pw *Visualizer) run(s screen.Screen) {
 	w, err := s.NewWindow(&screen.NewWindowOptions{
-		Title: pw.Title,
+		Title:  pw.Title,
+		Width:  800,
+		Height: 800,
 	})
 	if err != nil {
 		log.Fatal("Failed to initialize the app window:", err)
@@ -114,8 +116,18 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 		log.Printf("ERROR: %s", e)
 
 	case mouse.Event:
+		if e.Button != mouse.ButtonLeft { // Змінено на ліву кнопку
+			break
+		}
+		if e.Direction != mouse.DirPress {
+			break
+		}
 		if t == nil {
-			// TODO: Реалізувати реакцію на натискання кнопки миші.
+			pw.center = image.Point{
+				int(e.X),
+				int(e.Y),
+			}
+			pw.w.Send(paint.Event{})
 		}
 
 	case paint.Event:
@@ -131,11 +143,17 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 }
 
 func (pw *Visualizer) drawDefaultUI() {
-	pw.w.Fill(pw.sz.Bounds(), color.Black, draw.Src) // Фон.
+	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src) // Змінено на білий фон.
 
-	// TODO: Змінити колір фону та додати відображення фігури у вашому варіанті.
+	x, y := pw.center.X, pw.center.Y
+	clr := color.RGBA{0, 0, 255, 255} // Змінено на синій колір.
 
-	// Малювання білої рамки.
+	// Перший прямокутник малюється так, що він перетинається по центру горизонтально
+	pw.w.Fill(image.Rect(x-150, y-50, x+150, y+50), clr, draw.Src)
+
+	// Другий прямокутник малюється так, що він перетинається по центру вертикально
+	pw.w.Fill(image.Rect(x-50, y-100, x+50, y+100), clr, draw.Src)
+
 	for _, br := range imageutil.Border(pw.sz.Bounds(), 10) {
 		pw.w.Fill(br, color.White, draw.Src)
 	}
